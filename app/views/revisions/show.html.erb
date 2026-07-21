@@ -1,0 +1,7 @@
+<% content_for :title, "Revision #{@revision.number} — #{@post.title}" %>
+<h1>Revision <%= @revision.number %>: <%= @revision.title %></h1>
+<p>Saved by <%= @revision.editor.display_name %> at <time datetime="<%= @revision.created_at.iso8601 %>"><%= l(@revision.created_at, format: :long) %></time>.</p>
+<div class="article-body"><%= simple_format(@revision.body) %></div>
+<%= form_with url: restore_post_revision_path(@post, @revision), local: true do |form| %>
+  <%= form.label :reason, "Restore reason" %><%= form.text_field :reason, required: true, maxlength: 500 %><%= form.submit "Restore this revision" %>
+<% end %>

@@ -1,15 +1,27 @@
 /*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
- * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the bottom of the
- * compiled file so the styles you add here take precedence over styles defined in any styles
- * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
- * file per style scope.
- *
- *= require_tree .
  *= require_self
  */
+:root { color-scheme: light; font-family: system-ui, sans-serif; line-height: 1.6; }
+body { margin: 0; color: #172033; background: #fff; }
+main, .site-header nav, footer { max-width: 72rem; margin: auto; padding: 1rem; }
+.site-header { border-bottom: 1px solid #d7dce5; }
+nav { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+.brand { font-size: 1.25rem; font-weight: 700; margin-right: auto; }
+a { color: #0759b6; }
+a:focus, button:focus, input:focus, textarea:focus { outline: 3px solid #ffbf47; outline-offset: 2px; }
+.skip-link { position: absolute; left: -10000px; top: auto; }
+.skip-link:focus { left: 1rem; top: 1rem; z-index: 10; padding: .75rem; background: white; }
+.article-list article, .article, section { max-width: 48rem; margin-block: 2rem; }
+.byline, footer { color: #586174; }
+.article-body { font-size: 1.08rem; }
+.hero-image { display: block; max-width: 100%; height: auto; }
+label { display: block; font-weight: 600; }
+input[type="text"], input[type="email"], input[type="password"], input[type="url"], textarea, input[type="search"] { width: min(100%, 48rem); padding: .65rem; border: 1px solid #7a8495; border-radius: .2rem; }
+button, input[type="submit"] { padding: .6rem .9rem; cursor: pointer; }
+.link-button { appearance: none; border: 0; padding: 0; background: none; color: #0759b6; text-decoration: underline; font: inherit; }
+.flash { padding: .75rem; border-left: .3rem solid #246; background: #eef4fa; }
+.alert { border-color: #a51414; background: #fff0f0; }
+.status { padding: .4rem .7rem; background: #fff5cf; display: inline-block; }
+.comment { padding-block: 1rem; border-top: 1px solid #d7dce5; }
+.honeypot { position: absolute !important; left: -10000px !important; width: 1px; height: 1px; overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }

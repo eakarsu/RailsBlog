@@ -1,0 +1,7 @@
+<% content_for :title, "Author sign in — RailsBlog" %>
+<h1>Author sign in</h1>
+<%= form_with url: session_path, local: true do |form| %>
+  <p><%= form.label :email %><%= form.email_field :email, required: true, autocomplete: "username" %></p>
+  <p><%= form.label :password %><%= form.password_field :password, required: true, autocomplete: "current-password" %></p>
+  <%= form.submit "Sign in" %>
+<% end %>

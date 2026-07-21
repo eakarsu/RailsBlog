@@ -1,0 +1,6 @@
+<h1>Import articles</h1>
+<p>Uploads must use export schema version 1. Imports always create drafts.</p>
+<%= form_with url: import_path, multipart: true, local: true do |form| %>
+  <%= form.label :file, "JSON export file" %><%= form.file_field :file, required: true, accept: "application/json" %>
+  <%= form.submit "Validate only" %><%= form.submit "Import drafts", name: :commit_import, value: "true" %>
+<% end %>

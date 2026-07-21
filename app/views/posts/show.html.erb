@@ -1,14 +1,52 @@
-<p id="notice"><%= notice %></p>
+<% content_for :title, "#{@post.seo_title.presence || @post.title} — RailsBlog" %>
+<% content_for :meta_description, @post.seo_description.presence || @post.excerpt.presence || truncate(@post.body, length: 155) %>
+<% content_for :canonical_url, @post.canonical_url if @post.canonical_url.present? %>
 
-<p>
-  <strong>Title:</strong>
-  <%= @post.title %>
-</p>
+<article class="article">
+  <header>
+    <h1><%= @post.title %></h1>
+    <p class="byline">By <%= @post.author.display_name %><% if @post.published_at %> · <time datetime="<%= @post.published_at.iso8601 %>"><%= l(@post.published_at.to_date, format: :long) %></time><% end %></p>
+    <% unless @post.status == "published" %><p class="status">Status: <strong><%= @post.status.humanize %></strong></p><% end %>
+  </header>
+  <% if @post.hero_image.attached? %>
+    <%= image_tag media_path(signed_id: @post.hero_image.blob.signed_id, filename: @post.hero_image.filename), alt: "", class: "hero-image" %>
+  <% end %>
+  <div class="article-body"><%= simple_format(@post.body) %></div>
+  <% if @post.categories.any? %><p><strong>Categories:</strong> <%= @post.categories.map(&:name).join(", ") %></p><% end %>
+  <% if @post.tags.any? %><p><strong>Tags:</strong> <%= @post.tags.map(&:name).join(", ") %></p><% end %>
+</article>
 
-<p>
-  <strong>Body:</strong>
-  <%= @post.body %>
-</p>
+<% if signed_in? && (current_user.editor? || current_user.id == @post.author_id) %>
+  <section aria-labelledby="workflow-heading" class="workflow">
+    <h2 id="workflow-heading">Editorial workflow</h2>
+    <%= link_to "Revision history", post_revisions_path(@post) %>
+    <% if Publishing::Policy.new(current_user, @post).edit? %><%= link_to "Edit article", edit_post_path(@post) %><% end %>
+    <% if %w[draft rejected].include?(@post.status) %><%= button_to "Submit for review", submit_post_path(@post), method: :post %><% end %>
+    <% if current_user.editor? && @post.status == "review" %>
+      <%= button_to "Publish", publish_post_path(@post), method: :post %>
+      <%= form_with url: reject_post_path(@post), method: :post, local: true do |form| %>
+        <%= form.label :reason, "Rejection reason" %><%= form.text_field :reason, required: true, maxlength: 500 %><%= form.submit "Reject" %>
+      <% end %>
+    <% end %>
+    <% if %w[draft rejected published].include?(@post.status) && (current_user.editor? || (current_user.id == @post.author_id && @post.status != "published")) %>
+      <%= form_with url: archive_post_path(@post), method: :post, local: true do |form| %>
+        <%= form.label :reason, "Archive reason" %><%= form.text_field :reason, required: true, maxlength: 500 %><%= form.submit "Archive" %>
+      <% end %>
+    <% end %>
+  </section>
+<% end %>
 
-<%= link_to 'Edit', edit_post_path(@post) %> |
-<%= link_to 'Back', posts_path %>
+<% if @post.status == "published" %>
+  <section aria-labelledby="comments-heading">
+    <h2 id="comments-heading">Comments</h2>
+    <% @comments.each do |comment| %><article class="comment"><h3><%= comment.author %></h3><%= simple_format(comment.body) %></article><% end %>
+    <h3>Leave a comment</h3>
+    <%= form_with model: [@post, @comment], local: true do |form| %>
+      <%= form.label :author, "Name" %><%= form.text_field :author, required: true, maxlength: 80, autocomplete: "name" %>
+      <%= form.label :email %><%= form.email_field :email, maxlength: 254, autocomplete: "email" %>
+      <span class="honeypot" aria-hidden="true"><%= form.label :website %><%= form.text_field :website, tabindex: -1, autocomplete: "off" %></span>
+      <%= form.label :body, "Comment" %><%= form.text_area :body, required: true, maxlength: 5000, rows: 6 %>
+      <%= form.submit "Send for moderation" %>
+    <% end %>
+  </section>
+<% end %>

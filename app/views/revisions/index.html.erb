@@ -1,0 +1,7 @@
+<% content_for :title, "Revision history — #{@post.title}" %>
+<h1>Revision history for <%= @post.title %></h1>
+<ol>
+  <% @revisions.each do |revision| %>
+    <li><%= link_to "Revision #{revision.number}", post_revision_path(@post, revision) %> — saved by <%= revision.editor.display_name %> at <time datetime="<%= revision.created_at.iso8601 %>"><%= l(revision.created_at, format: :long) %></time><% if revision.reason.present? %>: <%= revision.reason %><% end %></li>
+  <% end %>
+</ol>

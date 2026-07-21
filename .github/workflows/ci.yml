@@ -1,0 +1,46 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: rails_blog
+          POSTGRES_PASSWORD: rails_blog_test
+          POSTGRES_DB: rails_blog_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U rails_blog -d rails_blog_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      RAILS_ENV: test
+      CI: true
+      DATABASE_URL: postgresql://rails_blog:rails_blog_test@localhost:5432/rails_blog_test
+      SECRET_KEY_BASE: ci-only-secret-key-base-that-is-long-and-never-used-outside-tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4.4"
+          bundler-cache: true
+      - name: Security checks
+        run: |
+          bundle exec bundle-audit check --update
+          bundle exec brakeman -q --no-pager
+      - name: Migration forward, rollback, and replay
+        run: |
+          bundle exec rails db:create db:migrate
+          bundle exec rails db:rollback STEP=2
+          bundle exec rails db:migrate
+      - name: Unit and service tests
+        run: bundle exec rails test test/models test/services
+      - name: Request and failure-path tests
+        run: bundle exec rails test test/integration
+      - name: End-to-end publishing journey
+        run: bundle exec rails test:system
+      - name: Reproducible release image
+        run: docker build --tag rails-blog:${{ github.sha }} .

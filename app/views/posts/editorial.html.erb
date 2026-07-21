@@ -1,0 +1,8 @@
+<% content_for :title, "Editorial queue — RailsBlog" %>
+<h1>Editorial queue</h1>
+<p>Oldest waiting articles appear first.</p>
+<ul>
+  <% @posts.each do |post| %>
+    <li><%= link_to post.title, post %> — <%= post.status.humanize %>, by <%= post.author.display_name %>, updated <time datetime="<%= post.updated_at.iso8601 %>"><%= time_ago_in_words(post.updated_at) %> ago</time></li>
+  <% end %>
+</ul>

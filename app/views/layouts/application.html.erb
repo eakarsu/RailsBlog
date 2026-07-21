@@ -1,14 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Blog2</title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= content_for?(:title) ? yield(:title) : "RailsBlog" %></title>
+  <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "Independent articles from RailsBlog" %>">
+  <% if content_for?(:canonical_url) %><link rel="canonical" href="<%= yield(:canonical_url) %>"><% end %>
+  <%= stylesheet_link_tag "application", media: "all" %>
   <%= csrf_meta_tags %>
 </head>
 <body>
-
-<%= yield %>
-
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header">
+    <nav aria-label="Primary navigation">
+      <%= link_to "RailsBlog", root_path, class: "brand" %>
+      <%= link_to "Search", search_path %>
+      <%= link_to "RSS", feed_path(format: :rss) %>
+      <% if signed_in? %>
+        <%= link_to "My articles", posts_path(mine: 1) %>
+        <%= link_to "New draft", new_post_path %>
+        <% if current_user.editor? %><%= link_to "Editorial queue", editorial_path %><% end %>
+        <% if current_user.moderator? %><%= link_to "Moderation", comments_path %><% end %>
+        <%= button_to "Sign out", logout_path, method: :delete, class: "link-button" %>
+      <% else %>
+        <%= link_to "Author sign in", login_path %>
+      <% end %>
+    </nav>
+  </header>
+  <main id="main-content" tabindex="-1">
+    <% flash.each do |type, message| %>
+      <div class="flash <%= type %>" role="status"><%= message %></div>
+    <% end %>
+    <%= yield %>
+  </main>
+  <footer><small>&copy; <%= Time.current.year %> RailsBlog</small></footer>
 </body>
 </html>

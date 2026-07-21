@@ -1,25 +1,19 @@
-<%= form_for(@post) do |f| %>
-  <% if @post.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@post.errors.count, "error") %> prohibited this post from being saved:</h2>
-
-      <ul>
-      <% @post.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="field">
-    <%= f.label :title %><br>
-    <%= f.text_field :title %>
-  </div>
-  <div class="field">
-    <%= f.label :body %><br>
-    <%= f.text_area :body %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+<%= form_with model: post, local: true do |form| %>
+  <% if post.errors.any? %><div role="alert"><h2>Please correct these errors</h2><ul><% post.errors.full_messages.each do |message| %><li><%= message %></li><% end %></ul></div><% end %>
+  <%= form.hidden_field :lock_version %>
+  <p><%= form.label :title %><%= form.text_field :title, required: true, maxlength: 180 %></p>
+  <p><%= form.label :excerpt %><%= form.text_area :excerpt, maxlength: 500, rows: 3 %></p>
+  <p><%= form.label :body %><%= form.text_area :body, required: true, maxlength: 200000, rows: 20 %></p>
+  <fieldset><legend>Taxonomy</legend>
+    <%= form.collection_check_boxes :category_ids, Category.order(:name), :id, :name %>
+    <%= form.collection_check_boxes :tag_ids, Tag.order(:name), :id, :name %>
+  </fieldset>
+  <p><%= form.label :hero_image, "Hero image (JPEG, PNG, WebP, or GIF; maximum 5 MB)" %><%= form.file_field :hero_image, accept: Post::ALLOWED_MEDIA_TYPES.join(",") %></p>
+  <details><summary>Search metadata</summary>
+    <p><%= form.label :seo_title %><%= form.text_field :seo_title, maxlength: 70 %></p>
+    <p><%= form.label :seo_description %><%= form.text_area :seo_description, maxlength: 160 %></p>
+    <p><%= form.label :canonical_url %><%= form.url_field :canonical_url, placeholder: "https://example.com/article" %></p>
+  </details>
+  <% if post.persisted? %><p><%= label_tag :revision_reason, "Revision note" %><%= text_field_tag :revision_reason, nil, maxlength: 500 %></p><% end %>
+  <%= form.submit %>
 <% end %>

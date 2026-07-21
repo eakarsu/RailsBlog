@@ -1,0 +1,15 @@
+<% content_for :title, "Moderation queue — RailsBlog" %>
+<h1>Moderation queue</h1>
+<% @comments.each do |comment| %>
+  <article class="comment">
+    <h2><%= comment.author %> on <%= link_to comment.post.title, comment.post %></h2>
+    <%= simple_format(comment.body) %>
+    <p>Automated score: <%= comment.spam_score %>; current state: <%= comment.status %></p>
+    <%= form_with url: moderate_comment_path(comment), local: true do |form| %>
+      <%= form.label :reason, "Moderation reason" %><%= form.text_field :reason, required: true, maxlength: 500 %>
+      <%= form.submit "Approve", name: :decision, value: "approve" %>
+      <%= form.submit "Reject", name: :decision, value: "reject" %>
+      <%= form.submit "Mark spam", name: :decision, value: "spam" %>
+    <% end %>
+  </article>
+<% end %>

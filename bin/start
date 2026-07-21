@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+
+bundle exec rails db:abort_if_pending_migrations
+exec bundle exec puma -C config/puma.rb

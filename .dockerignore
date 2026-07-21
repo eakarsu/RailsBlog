@@ -1,0 +1,7 @@
+.git
+.env
+log/*
+tmp/*
+storage/*
+db/*.sqlite3
+coverage

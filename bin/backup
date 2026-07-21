@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+: "${DATABASE_URL:?DATABASE_URL is required}"
+backup_dir="${BACKUP_DIRECTORY:-/app/backups}"
+mkdir -p "$backup_dir"
+timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+backup_file="$backup_dir/rails-blog-$timestamp.dump"
+pg_dump --format=custom --no-owner --no-acl --file="$backup_file" "$DATABASE_URL"
+sha256sum "$backup_file" > "$backup_file.sha256"
+printf '%s\n' "$backup_file"

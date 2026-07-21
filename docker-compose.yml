@@ -1,0 +1,26 @@
+services:
+  web:
+    build: .
+    env_file: .env
+    ports: ["3000:3000"]
+    volumes:
+      - media:/app/storage
+    depends_on:
+      database:
+        condition: service_healthy
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: rails_blog
+      POSTGRES_USER: rails_blog
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rails_blog -d rails_blog"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - database:/var/lib/postgresql/data
+volumes:
+  database:
+  media:
