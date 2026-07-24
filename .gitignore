@@ -17,3 +17,6 @@
 /tmp
 /public/assets
 /storage
+
+# Local runtime configuration and secrets
+.env

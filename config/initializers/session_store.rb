@@ -3,5 +3,5 @@
 Rails.application.config.session_store :cookie_store,
   key: "_rails_blog_session",
   httponly: true,
-  secure: Rails.env.production?,
+  secure: Rails.env.production? && ENV.fetch("FORCE_SSL", "true") == "true",
   same_site: :lax

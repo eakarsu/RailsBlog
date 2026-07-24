@@ -1,4 +1,6 @@
 class SessionsController < ApplicationController
+  skip_forgery_protection only: :create, if: -> { request.format.json? }
+
   def new; end
 
   def create
