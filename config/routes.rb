@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   delete "/logout", to: "sessions#destroy", as: :logout
   post "/api/auth/login", to: "sessions#create", defaults: { format: :json }
   get "/api/auth/me", to: "sessions#show", defaults: { format: :json }
+  get "/api/auth/demo-credentials", to: "sessions#demo_credentials", defaults: { format: :json }
   post "/api/runtime-ai/editorial-advice", to: "runtime_ai#create", defaults: { format: :json }
 
   resources :posts, param: :slug do

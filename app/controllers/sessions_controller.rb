@@ -32,6 +32,15 @@ class SessionsController < ApplicationController
     render json: { user: session_user(user) }
   end
 
+  def demo_credentials
+    return head :not_found unless ENV["LOCAL_DEMO_AUTH"] == "true"
+    email = ENV["PROVISION_ADMIN_EMAIL"] || ENV["ADMIN_EMAIL"]
+    password = ENV["PROVISION_ADMIN_PASSWORD"] || ENV["ADMIN_PASSWORD"]
+    return render json: { error: "demo_credentials_unavailable" }, status: :service_unavailable if email.blank? || password.blank?
+    response.headers["Cache-Control"] = "no-store"
+    render json: { email: email, password: password }
+  end
+
   def destroy
     reset_session
     redirect_to root_path, notice: "Signed out."

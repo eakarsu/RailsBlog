@@ -66,14 +66,15 @@ if [ "${OPENROUTER_BASE_URL:-}" != "https://openrouter.ai/api/v1" ]; then
 fi
 case "${ALLOW_SCHEMA_MIGRATION:-}" in true|1) ;; *) printf 'ALLOW_SCHEMA_MIGRATION=true is required.\n' >&2; exit 1;; esac
 
-if [ -n "${RAILS_ENV:-}" ]; then
-  runtime_environment="$RAILS_ENV"
+if [ "${NODE_ENV:-development}" = production ]; then
+  runtime_environment=production
 elif [ "${NODE_ENV:-}" = test ]; then
   runtime_environment=test
 else
   runtime_environment=development
 fi
 export RAILS_ENV="$runtime_environment"
+export LOCAL_DEMO_AUTH=true
 
 bundle exec rails db:prepare
 bundle exec rails db:seed
