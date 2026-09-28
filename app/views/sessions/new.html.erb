@@ -1,7 +1,8 @@
 <% content_for :title, "Author sign in — RailsBlog" %>
 <h1>Author sign in</h1>
 <%= form_with url: session_path, local: true do |form| %>
-  <p><%= form.label :email %><%= form.email_field :email, required: true, autocomplete: "username" %></p>
-  <p><%= form.label :password %><%= form.password_field :password, required: true, autocomplete: "current-password" %></p>
+  <p><%= form.label :email %><%= form.email_field :email, value: @demo_email, required: true, autocomplete: "username" %></p>
+  <p><%= form.label :password %><%= form.password_field :password, value: @demo_password, required: true, autocomplete: "current-password" %></p>
+  <button type="submit" formmethod="get" formaction="<%= login_path %>" formnovalidate name="demo" value="1">Auto Fill Demo Credentials</button>
   <%= form.submit "Sign in" %>
 <% end %>

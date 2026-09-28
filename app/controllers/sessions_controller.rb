@@ -1,7 +1,12 @@
 class SessionsController < ApplicationController
   skip_forgery_protection only: :create, if: -> { request.format.json? }
 
-  def new; end
+  def new
+    return unless params[:demo] == "1" && ENV["LOCAL_DEMO_AUTH"] == "true"
+
+    @demo_email = ENV["BOOTSTRAP_ADMIN_EMAIL"].presence || ENV["PROVISION_ADMIN_EMAIL"].presence || ENV["ADMIN_EMAIL"].presence
+    @demo_password = ENV["BOOTSTRAP_ADMIN_PASSWORD"].presence || ENV["PROVISION_ADMIN_PASSWORD"].presence || ENV["ADMIN_PASSWORD"].presence
+  end
 
   def create
     user = User.find_by(email: params[:email].to_s.downcase.strip)
@@ -34,8 +39,8 @@ class SessionsController < ApplicationController
 
   def demo_credentials
     return head :not_found unless ENV["LOCAL_DEMO_AUTH"] == "true"
-    email = ENV["PROVISION_ADMIN_EMAIL"] || ENV["ADMIN_EMAIL"]
-    password = ENV["PROVISION_ADMIN_PASSWORD"] || ENV["ADMIN_PASSWORD"]
+    email = ENV["BOOTSTRAP_ADMIN_EMAIL"].presence || ENV["PROVISION_ADMIN_EMAIL"].presence || ENV["ADMIN_EMAIL"].presence
+    password = ENV["BOOTSTRAP_ADMIN_PASSWORD"].presence || ENV["PROVISION_ADMIN_PASSWORD"].presence || ENV["ADMIN_PASSWORD"].presence
     return render json: { error: "demo_credentials_unavailable" }, status: :service_unavailable if email.blank? || password.blank?
     response.headers["Cache-Control"] = "no-store"
     render json: { email: email, password: password }
