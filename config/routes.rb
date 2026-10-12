@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   root "posts#index"
+  get "/ai-workspace", to: "native_ai_workspace#show"
 
   resource :session, only: %i[new create destroy]
   get "/login", to: "sessions#new", as: :login
@@ -8,6 +9,7 @@ Rails.application.routes.draw do
   get "/api/auth/me", to: "sessions#show", defaults: { format: :json }
   get "/api/auth/demo-credentials", to: "sessions#demo_credentials", defaults: { format: :json }
   post "/api/runtime-ai/editorial-advice", to: "runtime_ai#create", defaults: { format: :json }
+  get "/api/runtime-ai/results", to: "runtime_ai#index", defaults: { format: :json }
 
   resources :posts, param: :slug do
     resources :comments, only: :create

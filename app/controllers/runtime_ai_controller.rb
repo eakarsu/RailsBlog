@@ -5,6 +5,22 @@ class RuntimeAiController < ApplicationController
   skip_forgery_protection only: :create, if: -> { request.format.json? }
   before_action :authenticate!
 
+  def index
+    results = RuntimeAiResult.where(user: current_user).order(created_at: :desc).limit(50).map do |result|
+      {
+        id: result.id,
+        name: result.prompt.truncate(80),
+        prompt: result.prompt,
+        content: parsed_content(result.content),
+        provider: result.provider,
+        model: result.model,
+        created_at: result.created_at
+      }
+    end
+    response.headers["Cache-Control"] = "no-store"
+    render json: { data: results }
+  end
+
   def create
     prompt = params[:prompt].to_s.strip
     return render json: { error: "prompt_required" }, status: :bad_request if prompt.empty?
@@ -37,11 +53,19 @@ class RuntimeAiController < ApplicationController
       provider: "openrouter",
       model: model
     )
-    render json: { content: content, provider: result.provider, model: result.model, persistedId: result.id }
+    render json: { content: parsed_content(content), provider: result.provider, model: result.model, persistedId: result.id }
   rescue KeyError => error
     render json: { error: error.message }, status: :service_unavailable
   rescue StandardError => error
     Rails.logger.error("runtime_ai_error=#{error.class}: #{error.message}")
     render json: { error: "ai_provider_request_failed" }, status: :bad_gateway
+  end
+
+  private
+
+  def parsed_content(content)
+    JSON.parse(content)
+  rescue JSON::ParserError
+    content
   end
 end

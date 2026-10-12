@@ -1,0 +1,81 @@
+<section id="native-ai-studio" class="native-vanilla-studio"></section>
+<link rel="stylesheet" href="/NativeAIStudio.css">
+<script src="/NativeAIReport.js"></script>
+<script src="/NativeAIStudio.js"></script>
+<script>
+window.NativeWorkflowStudio.mount({
+  element: document.getElementById('native-ai-studio'),
+  config: {
+    title: 'RailsBlog editorial advice',
+    features: [{
+      id: 'native-review',
+      endpoint: '/api/runtime-ai/editorial-advice',
+      title: 'Editorial planning',
+      description: 'These examples are fictional planning scenarios. Replace their details with verified sources before using advice in an article.',
+      fields: [
+        {key: 'prompt', label: 'Editorial question', type: 'text', required: true, presets: [
+          'Plan a reported article on a proposed neighborhood bus route. Identify facts to verify, people to interview, and a balanced outline.',
+          'Compare two angles for a feature about a public library expanding weekend hours. Recommend an evidence-led structure and questions for staff and patrons.',
+          'Review a draft plan for covering a city heat response. Flag unsupported claims, missing perspectives, and practical next reporting steps.'
+        ]},
+        {key: 'goal', label: 'Goal', type: 'text', required: false, presets: [
+          'Prepare an editor-ready reporting plan, not a publishable claim.',
+          'Choose a clear angle for a reported service feature.',
+          'Strengthen accuracy and usefulness before drafting.'
+        ]},
+        {key: 'context', label: 'Context', type: 'text', required: false, presets: [
+          'Fictional scenario: a transit agency is considering a route change and has announced a public comment period.',
+          'Fictional scenario: a library board is considering a Saturday pilot at two branches.',
+          'Fictional scenario: city agencies have published heat guidance; local conditions and results still need confirmation.'
+        ]},
+        {key: 'audience', label: 'Audience', type: 'text', required: false, presets: [
+          'Residents who use or may be affected by local buses.',
+          'Library patrons and families deciding whether weekend visits are practical.',
+          'Residents seeking clear, accessible information about heat services.'
+        ]},
+        {key: 'source_summary', label: 'Source summary', type: 'text', required: false, presets: [
+          'No documents or interviews have been verified yet; request the proposal, route maps, and rider comments.',
+          'No primary records have been verified yet; request board minutes, pilot costs, and usage data.',
+          'No local figures have been verified yet; request agency plans, location lists, and recent outcome data.'
+        ]},
+        {key: 'constraints', label: 'Constraints', type: 'text', required: false, presets: [
+          'Label every unverified point and seek responses from affected riders and the transit agency.',
+          'Avoid promising hours or services until the board decision and branch details are confirmed.',
+          'Do not present general advice as verified local availability; confirm dates, locations, and accessibility.'
+        ]},
+        {key: 'budget', label: 'Reporting budget', type: 'text', required: false, presets: [
+          'One reporter, two reporting days, and one editor review.',
+          'One reporter, one data request, and three interviews.',
+          'One reporter, one fact-check pass, and limited graphics support.'
+        ]},
+        {key: 'deadline', label: 'Deadline', type: 'text', required: false, presets: [
+          'Planning memo due Friday; publication date follows verification.',
+          'Angle decision due after the next board meeting.',
+          'Draft review before the next forecast update.'
+        ]},
+        {key: 'tone', label: 'Tone', type: 'text', required: false, presets: [
+          'Neutral, precise, and accessible.',
+          'Useful, measured, and community focused.',
+          'Clear, calm, and practical.'
+        ]},
+        {key: 'output_format', label: 'Output format', type: 'text', required: false, presets: [
+          'Use sections for verification, interview questions, outline, and risks.',
+          'Provide a comparison table, recommended angle, and reporting checklist.',
+          'Provide a claim review table and a prioritized follow-up list.'
+        ]}
+      ]
+    }],
+    resources: [{key: 'aiResults', label: 'Saved AI reports', endpoint: '/api/runtime-ai/results', fields: []}]
+  },
+  request: async (path, options = {}) => {
+    const response = await fetch(path, {
+      ...options,
+      credentials: 'same-origin',
+      headers: {'Content-Type': 'application/json', 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content, ...options.headers}
+    });
+    const body = await response.json();
+    if (!response.ok) throw new Error(body.error || 'Request failed');
+    return body;
+  }
+}).setAuthenticated(true);
+</script>
