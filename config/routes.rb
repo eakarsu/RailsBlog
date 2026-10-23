@@ -36,4 +36,5 @@ Rails.application.routes.draw do
   resource :export, only: :show
   resource :import, only: %i[new create]
   get "/health", to: "health#show"
+  get "/api/health", to: "health#show"
 end
